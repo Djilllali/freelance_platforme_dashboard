@@ -1,0 +1,72 @@
+/* .ant-menu {
+  color: rgba(255, 255, 255, 0.85) !important;
+  background-color: #6d75a5 !important;
+}
+.ant-menu-submenu > .ant-menu {
+  background-color: #727ec5 !important;
+} */
+/* .ant-menu-item-selected {
+  background-color: #c8eeb6 !important;
+} */
+ant-menu-dark.ant-menu-dark:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  background-color: #5464b8 !important;
+}
+
+.ant-menu.ant-menu-dark .ant-menu-item-selected, .ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected {
+  background-color: #5464b8 !important;
+}
+.ant-menu.ant-menu-dark,
+.ant-menu.ant-menu-dark .ant-menu-sub {
+  background: #01488f !important;
+  background-color: #01488f !important;
+}
+.ant-menu-dark .ant-menu-sub,
+.ant-menu.ant-menu-dark .ant-menu-sub {
+  background: #01488f !important;
+  background-color: #01488f !important;
+}
+
+.ant-layout-sider-trigger {
+  background: #01488f !important;
+  background-color: #01488f !important;
+}
+.ant-layout-sider {
+  background: #01488f !important;
+  background-color: #01488f !important;
+}
+#components-layout-demo-side .logo {
+  height: 32px;
+  margin: 16px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.logo-img {
+  width: 90%;
+  transition: 0.4s;
+  padding: 0;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+.logo-img:hover {
+  width: 100%;
+  transition: 0.4s;
+}
+
+.ant-layout-header {
+  height: 10%;
+  background: #fff !important;
+  background-color: #fff !important;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+  height: 59px!important;
+}
+.site-layout .site-layout-background {
+  background: #fff;
+  overflow: hidden;
+  background: #fff !important;
+  background-color: #fff !important;
+}
+.tab {
+  display: inline-block;
+  margin-left: 15px;
+}
