@@ -31,23 +31,18 @@ import {
 import { setPathname, fetchUserProfile } from "./dashboardSlice";
 import { setredirectToDashboard } from "../signin/signinSlice";
 import { Content } from "antd/lib/layout/layout";
-import Tickets from "../tickets/ticket";
-import PendingTickets from "../ticket-nouveau/ticketNouveau";
-import EncoursTickets from "../ticket-encours/ticketEnCours";
-import TermineTickets from "../ticket-termines/ticketTermine";
-import SingleTicket from "../singleTicket/singleTicket";
-import ValidateTicket from "../ticket-validation/ticketValidation";
-import TicketsArchive from "../ticket-archived/ticketArchived";
+import users from "../users/users";
+import Jobs from "../jobs/jobs";
 
 const { Header, Footer, Sider } = Layout;
 const { Text } = Typography;
 const { SubMenu } = Menu;
 let keys = {
-  "/dashboard/tickets": "tickets",
-  "/dashboard/tickets/pending": "pending",
-  "/dashboard/tickets/encours": "encours",
-  "/dashboard/tickets/termine": "termine",
-  "/dashboard/tickets/archive": "archive",
+  "/dashboard/users": "users",
+  "/dashboard/allJobs": "allJobs",
+  "/dashboard/users/encours": "encours",
+  "/dashboard/users/termine": "termine",
+  "/dashboard/users/archive": "archive",
 };
 
 let Dashboard = ({}) => {
@@ -68,9 +63,6 @@ let Dashboard = ({}) => {
   const fetchProfileError = useSelector(
     (state) => state.dashboard?.fetchProfileError
   );
-  {
-    console.log("type", fetchProfileResult?.user.type);
-  }
   const { collapsed } = state;
   const { useEffect } = React;
   const onCollapse = (collapsed) => {
@@ -86,20 +78,20 @@ let Dashboard = ({}) => {
       current: e.key,
     });
     switch (e.key) {
-      case "tickets":
-        history.push("/dashboard/tickets");
+      case "users":
+        history.push("/dashboard/users");
         break;
-      case "pending":
-        history.push("/dashboard/tickets/pending");
+      case "allJobs":
+        history.push("/dashboard/allJobs");
         break;
       case "encours":
-        history.push("/dashboard/tickets/encours");
+        history.push("/dashboard/users/encours");
         break;
       case "termine":
-        history.push("/dashboard/tickets/termine");
+        history.push("/dashboard/users/termine");
         break;
       case "archive":
-        history.push("/dashboard/tickets/archive");
+        history.push("/dashboard/users/archive");
         break;
     }
   };
@@ -123,7 +115,7 @@ let Dashboard = ({}) => {
           <Col>
             <span className="tab">
               {" "}
-              <h5>{fetchProfileResult?.user.name}</h5>
+              <h5>{fetchProfileResult?.data.name}</h5>
             </span>{" "}
           </Col>
         </Row>
@@ -136,20 +128,24 @@ let Dashboard = ({}) => {
           <Col>
             <span className="tab">
               {" "}
-              <h5>{fetchProfileResult?.user.email}</h5>
+              <h5>{fetchProfileResult?.data.email}</h5>
             </span>{" "}
           </Col>
         </Row>
         <Divider />
         <Row>
-          <Col offset={6}>
+          {/* <Col offset={6}>
             {" "}
             {fetchProfileResult?.user.type === "assistantFr" ? (
-              <Tag color="#FFD700" style={{ fontSize: "20px" }}>Assistant FR </Tag>
+              <Tag color="#FFD700" style={{ fontSize: "20px" }}>
+                Assistant FR{" "}
+              </Tag>
             ) : (
-              <Tag color="#C0C0C0" style={{ fontSize: "20px" }}>Assistant DZ </Tag>
+              <Tag color="#C0C0C0" style={{ fontSize: "20px" }}>
+                Assistant DZ{" "}
+              </Tag>
             )}
-          </Col>
+          </Col> */}
         </Row>
       </div>
 
@@ -208,32 +204,30 @@ let Dashboard = ({}) => {
           style={{ overflow: "auto" }}
           selectedKeys={[state.current]}
         >
-          {fetchProfileResult?.user.type === "assistantFr" && (
-            <Menu.Item key="tickets" icon={<AlignLeftOutlined />}>
-              Tous les tickets
-            </Menu.Item>
-          )}
-          {fetchProfileResult?.user.type === "assistantFr" && (
-            <Menu.Item key="archive" icon={<FileProtectOutlined />}>
-              Les tickets archivés
-            </Menu.Item>
-          )}
+          <Menu.Item key="users" icon={<AlignLeftOutlined />}>
+            All users
+          </Menu.Item>
 
-          {fetchProfileResult?.user.type === "assistantDz" && (
+          <Menu.Item key="allJobs" icon={<FileProtectOutlined />}>
+            All jobs
+          </Menu.Item>
+
+          {/* {fetchProfileResult?.user.type === "assistantDz" && (
             <Menu.Item key="pending" icon={<SendOutlined />}>
-              Les tickets disponibles
+              Les users disponibles
             </Menu.Item>
-          )}
-          {fetchProfileResult?.user.type === "assistantDz" && (
-            <Menu.Item key="encours" icon={<LoadingOutlined />}>
-              Les tickets en cours
-            </Menu.Item>
-          )}
-          {fetchProfileResult?.user.type === "assistantDz" && (
-            <Menu.Item key="termine" icon={<SafetyCertificateOutlined />}>
-              Les tickets terminés
-            </Menu.Item>
-          )}
+          )} */}
+
+          <Menu.Item key="encours" icon={<LoadingOutlined />}>
+            Marketing
+          </Menu.Item>
+
+          <Menu.Item key="termine" icon={<SafetyCertificateOutlined />}>
+            Plans
+          </Menu.Item>
+          <Menu.Item key="" icon={<SafetyCertificateOutlined />}>
+            Withdrawals requests
+          </Menu.Item>
         </Menu>
       </Sider>
       <Layout
@@ -273,37 +267,38 @@ let Dashboard = ({}) => {
         </Header>
         <Content>
           <Switch>
-            <Route exact path="/dashboard/tickets" component={Tickets} />
-            <Route
+            <Route exact path="/dashboard/users" component={users} />
+            {/* <Route
               exact
-              path="/dashboard/tickets/encours/:_id"
+              path="/dashboard/users/encours/:_id"
               component={SingleTicket}
             />
             <Route
               exact
-              path="/dashboard/tickets/archive"
-              component={TicketsArchive}
+              path="/dashboard/users/archive"
+              component={usersArchive}
             />
             <Route
               exact
-              path="/dashboard/tickets/termine/:_id"
+              path="/dashboard/users/termine/:_id"
               component={ValidateTicket}
             />
             <Route
               exact
-              path="/dashboard/tickets/pending"
-              component={PendingTickets}
+              path="/dashboard/users/pending"
+              component={Pendingusers}
             />
             <Route
               exact
-              path="/dashboard/tickets/encours"
-              component={EncoursTickets}
+              path="/dashboard/users/encours"
+              component={Encoursusers}
             />
             <Route
               exact
-              path="/dashboard/tickets/termine"
-              component={TermineTickets}
-            />
+              path="/dashboard/users/termine"
+              component={Termineusers}
+            /> */}
+            <Route exact path="/dashboard/allJobs" component={Jobs} />
             <Route exact path="/dashboard/" />
           </Switch>
         </Content>

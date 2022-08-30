@@ -52,8 +52,8 @@ export const fetchSignin = (data) => (dispatch, getState) => {
   dispatch(setFetchingSignin(true));
   const response = axios(config)
     .then((response) => {
-      localStorage.setItem("token", response.data.accessJWT);
-      console.log("token", response.data.accessJWT);
+      localStorage.setItem("token", response.data.data.token);
+      console.log("token", response.data.data.token);
       dispatch(setSigninResult(response.data));
     })
     .catch((response) => {

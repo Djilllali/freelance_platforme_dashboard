@@ -17,22 +17,22 @@ ant-menu-dark.ant-menu-dark:not(.ant-menu-horizontal) .ant-menu-item-selected {
 }
 .ant-menu.ant-menu-dark,
 .ant-menu.ant-menu-dark .ant-menu-sub {
-  background: #01488f !important;
-  background-color: #01488f !important;
+  background: #5d37d0 !important;
+  background-color: #5d37d0 !important;
 }
 .ant-menu-dark .ant-menu-sub,
 .ant-menu.ant-menu-dark .ant-menu-sub {
-  background: #01488f !important;
-  background-color: #01488f !important;
+  background: #5d37d0 !important;
+  background-color: #5d37d0 !important;
 }
 
 .ant-layout-sider-trigger {
-  background: #01488f !important;
-  background-color: #01488f !important;
+  background: #5d37d0 !important;
+  background-color: #5d37d0 !important;
 }
 .ant-layout-sider {
-  background: #01488f !important;
-  background-color: #01488f !important;
+  background: #5d37d0 !important;
+  background-color: #5d37d0 !important;
 }
 #components-layout-demo-side .logo {
   height: 32px;

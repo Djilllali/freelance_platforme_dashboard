@@ -16,7 +16,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { LoadingOutlined } from "@ant-design/icons";
 import { fetchSignin, setSigninError, initSignin } from "./signinSlice";
 import React from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 import { fetchUserProfile } from "../dashboard/dashboardSlice";
 import Background from "../../4428859.svg";
 const { Title, Paragraph, Text } = Typography;
@@ -29,7 +29,7 @@ const Signin = () => {
     password: "",
     remember: false,
   });
-
+  let history = useHistory();
   const dispatch = useDispatch();
 
   const fetchSigninError = useSelector(
@@ -62,10 +62,13 @@ const Signin = () => {
   const handleSigninClick = (e) => {
     dispatch(fetchSignin(state));
   };
-  if (signInResult?.userType === "assistantDz")
-    return <Redirect to="/dashboard/tickets/pending" />;
-  if (signInResult?.userType === "assistantFr")
-    return <Redirect to="/dashboard/tickets" />;
+  // if (signInResult?.userType === "assistantDz")
+  //   return <Redirect to="/dashboard/tickets/pending" />;
+  // if (signInResult?.userType === "assistantFr")
+  //   return
+  if (localStorage.token) {
+    history.push("/dashboard/users");
+  }
   return (
     <Row justify="center" align="middle" style={{ height: "100vh" }}>
       <Col xs={12} style={{ padding: "0px 128px 128px 128px" }}>
@@ -95,7 +98,9 @@ const Signin = () => {
               }}
               className="center"
             ></img>
-            <h3 style={{ marginBottom: 32, marginLeft:30 }}>Connectez-vous!</h3>
+            <h3 style={{ marginBottom: 32, marginLeft: 30 }}>
+              TURING JOBS DZ
+            </h3>
             <Form name="normal_login" className="register-form">
               <Form.Item
                 name="Email"
@@ -182,7 +187,7 @@ const Signin = () => {
           backgroundPosition: "right center",
           backgroundSize: "50%",
           height: "100vh",
-          backgroundColor: "#01488f",
+          backgroundColor: "#5d37d0",
           boxShadow: "-7px 1px 26px -2px rgba(0,0,0,0.78)",
         }}
       ></Col>

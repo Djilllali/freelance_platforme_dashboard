@@ -13,6 +13,7 @@ import {
   DatePicker,
   Tag,
   message,
+  Skeleton,
 } from "antd";
 import Modal from "antd/lib/modal/Modal";
 import {
@@ -22,7 +23,8 @@ import {
   CheckCircleOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTickets, setFilters, setPage, AddnewTicket } from "./ticketSlice";
+import { fetchAllJobs, AddnewJob, setFilters, setPage } from "./jobsSlice";
+import { fetchAllDomains } from "../users/usersSlice";
 import Highlighter from "react-highlight-words";
 import Title from "antd/lib/skeleton/Title";
 import { Switch } from "react-router-dom";
@@ -53,16 +55,19 @@ const Clients = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchTickets());
+    dispatch(fetchAllJobs());
+    dispatch(fetchAllDomains());
   }, []);
 
   const isFetchingTickets = useSelector(
-    (state) => state.tickets?.isFetchingTickets
+    (state) => state.jobs?.isFetchingAllJobs
   );
-  const fetchTicketsResult = useSelector(
-    (state) => state.tickets.fetchTicketsResult
+  const fetchAllJobsResult = useSelector(
+    (state) => state.jobs.fetchAllJobsResult
   );
-
+  const fetchAllDomainsResult = useSelector(
+    (state) => state.users.fetchAllDomainsResult
+  );
   let searchInput = useRef(null);
   const toggleswitched = (e) => {
     setState({ ...state, switcher: e });
@@ -73,9 +78,13 @@ const Clients = () => {
   const { Option } = Select;
 
   const [addNew, setAddNew] = React.useState({
-    subject: "",
+    title: "",
     description: "",
     deadline: "",
+    estimated_time: "",
+    initial_price: "",
+    client_price: "",
+    domain: "",
     visible: false,
   });
   const getColumnSearchProps = (dataIndex) => ({
@@ -152,21 +161,143 @@ const Clients = () => {
 
   const columns = [
     {
-      title: "Intitulé",
-      dataIndex: "subject",
-      key: "subject",
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
       width: "25%",
       align: "center",
-      ...getColumnSearchProps("subject"),
     },
     {
-      title: "Date de création",
-      dataIndex: "openAt",
-      key: "openAt",
+      title: "Creator",
+      dataIndex: "creator",
+      key: "creator",
       width: "25%",
       align: "center",
       render: (text) => {
-        return moment(text).format("DD/MM/yyyy");
+        return text?.name;
+      },
+    },
+    {
+      title: "Assigned to",
+      dataIndex: "assignedTo",
+      key: "assignedTo",
+      width: "25%",
+      align: "center",
+      render: (text) => {
+        return text?.name || <Tag color={"lightGrey"}>not assigned</Tag>;
+      },
+    },
+    {
+      title: "Estimated time",
+      dataIndex: "estimated_time",
+      key: "estimated_time",
+      width: "25%",
+      align: "center",
+      render: (text) => {
+        return text + " Days";
+      },
+    },
+
+    {
+      title: "Domain",
+      dataIndex: "domain",
+      key: "domain.name",
+      width: "25%",
+      align: "center",
+      filters: [
+        {
+          text: "Business",
+          value: "Business",
+        },
+        {
+          text: "Ingenierie",
+          value: "Ingenierie",
+        },
+        {
+          text: "Medical",
+          value: "Medical",
+        },
+        {
+          text: "Informatique",
+          value: "Informatique",
+        },
+      ],
+
+      filterMultiple: false,
+      onFilter: (value, record) => record.domain.name.indexOf(value) === 0,
+
+      filterSearch: true,
+      render: (text) => {
+        const colors = {
+          Business: "green",
+          Ingenierie: "purple",
+          Medical: "yellow",
+          Informatique: "blue",
+        };
+        return <Tag color={colors[text.name]}>{text.name}</Tag>;
+      },
+    },
+    {
+      title: "Initial price",
+      dataIndex: "initial_price",
+      key: "initial_price",
+      width: "25%",
+      align: "center",
+      render: (text) => {
+        return text + " DZD";
+      },
+    },
+    {
+      title: "Client price",
+      dataIndex: "client_price",
+      key: "client_price",
+      width: "25%",
+      align: "center",
+      render: (text) => {
+        return text + " DZD";
+      },
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      align: "center",
+      width: "25%",
+      filters: [
+        {
+          text: "In progress",
+          value: "inprogress",
+        },
+        {
+          text: "virgin",
+          value: "virgin",
+        },
+        {
+          text: "Finished",
+          value: "finished",
+        },
+        {
+          text: "Approved",
+          value: "approved",
+        },
+        {
+          text: "Paid",
+          value: "paid",
+        },
+      ],
+
+      filterMultiple: false,
+      onFilter: (value, record) => record.status.indexOf(value) === 0,
+      filterSearch: true,
+      render: (text) => {
+        const colors = {
+          inprogress: "red",
+          virgin: "blue",
+          finished: "yellow",
+          approved: "orange",
+          paid: "green",
+        };
+        return <Tag color={colors[text]}>{text.toUpperCase()}</Tag>;
       },
     },
     {
@@ -179,60 +310,43 @@ const Clients = () => {
         return moment(text).format("DD/MM/yyyy");
       },
     },
-    {
-      title: "Etat",
-      dataIndex: "status",
-      key: "status",
-      align: "center",
-      width: "25%",
-      filters: [
-        {
-          text: "Nouveau",
-          value: "Nouveau",
-        },
-        {
-          text: "en cours",
-          value: "en cours",
-        },
-        {
-          text: "terminé",
-          value: "termine",
-        },
-      ],
-
-      filterMultiple: false,
-      onFilter: (value, record) => record.status.indexOf(value) === 0,
-      filterSearch: true,
-      render: (text) => {
-        const colors = {
-          Nouveau: "blue",
-          "en cours": "orange",
-          termine: "green",
-        };
-        return <Tag color={colors[text]}>{text.toUpperCase()}</Tag>;
-      },
-    },
+    // {
+    //   title: "Deadline",
+    //   dataIndex: "deadline",
+    //   key: "deadline",
+    //   width: "25%",
+    //   align: "center",
+    //   render: (text) => {
+    //     return moment(text).format("DD/MM/yyyy");
+    //   },
     {
       title: "plus",
       align: "center",
       width: "25%",
 
-      render: (text) => {
-        return text.status === "termine" ? (
+      render: (e) => {
+        return (
           <div>
             <Button
-              icon={<EditOutlined />}
-              size="large"
+              type="primary"
+              icon={<PlusOutlined />}
               onClick={() =>
-                history.push("/dashboard/tickets/termine/" + text._id)
+                setAddNew({
+                  ...addNew,
+                  visible: true,
+                  update: true,
+                  _id: e._id,
+                  name: e.name,
+                  email: e.email,
+                  phone: e.phone,
+                  domain: e.domain._id,
+                  pack: e.pack._id,
+                })
               }
             >
-              {" "}
-              Afficher plus
+              Edit Job
             </Button>
           </div>
-        ) : (
-          "---"
         );
       },
     },
@@ -242,7 +356,7 @@ const Clients = () => {
       dispatch(setFilters(filters));
       dispatch(setPage(1));
       dispatch(
-        fetchTickets({
+        fetchAllJobs({
           ...filters,
           page: 1,
         })
@@ -252,7 +366,7 @@ const Clients = () => {
       dispatch(setPage(1));
 
       dispatch(
-        fetchTickets({
+        fetchAllJobs({
           ...filters,
           page: 1,
         })
@@ -281,10 +395,15 @@ const Clients = () => {
   //   fileList: state.fileList,
   // };
   const handleaddNew = () => {
+    console.log("addnew", addNew);
     if (
-      addNew.subjet === "" ||
-      addNew.description === "" ||
-      addNew.deadline === ""
+      !addNew.title === "" ||
+      !addNew.description === "" ||
+      !addNew.deadline === "" ||
+      !addNew.estimated_time === "" ||
+      !addNew.initial_price === "" ||
+      !addNew.client_price === "" ||
+      !addNew.domain
     ) {
       message.error("Merci de compléter tous les champs!");
     } else {
@@ -292,30 +411,28 @@ const Clients = () => {
 
       delete my_edit.visible;
 
-      dispatch(AddnewTicket({ ...my_edit }));
+      dispatch(AddnewJob({ ...my_edit }));
       setAddNew({ ...addNew, visible: false });
     }
   };
   const getDateValue = (dateString) => {
-    setAddNew({ ...addNew, deadline: dateString });
+    let date = moment(dateString._d).format("DD/MM/yyyy");
+    setAddNew({ ...addNew, deadline: date });
   };
   const checkNotifications = () => {
-    fetchTicketsResult?.result?.map(
-      (element) =>
-        element.downloaded === false &&
-        element.status === "termine" &&
-        notification.info({
-          message: element.subject,
-          description:
-            'Le ticket " ' +
-            element.subject +
-            '"a été terminé, cliquez ici pour obtenir les détails du ticket',
-          placement: "topRight",
-          duration: 5,
-          onClick: () => {
-            history.push("/dashboard/tickets/termine/" + element._id);
-          },
-        })
+    fetchAllJobsResult?.allJobs?.map((element) =>
+      notification.info({
+        message: element?.name,
+        description:
+          'Le ticket " ' +
+          element.subject +
+          '"a été terminé, cliquez ici pour obtenir les détails du ticket',
+        placement: "topRight",
+        duration: 5,
+        onClick: () => {
+          history.push("/dashboard/tickets/termine/" + element._id);
+        },
+      })
     );
   };
 
@@ -332,13 +449,13 @@ const Clients = () => {
                 margin: "8px 0px",
               }}
             >
-              <h1 style={{ fontSize: "35px" }}> La liste des tickets</h1>
+              <h1 style={{ fontSize: "35px" }}> All Jobs list</h1>
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={() => setAddNew({ ...addNew, visible: true })}
               >
-                Créer un ticket
+                Create a new job
               </Button>
               <span className="tab">
                 {" "}
@@ -362,19 +479,19 @@ const Clients = () => {
 
             {addNew?.visible && (
               <Modal
-                title={"Nouveau ticket"}
+                title={"NEW JOB"}
                 centered
                 visible={addNew?.visible}
                 onOk={handleaddNew}
                 onCancel={() => setAddNew({ ...addNew, visible: false })}
                 width={600}
-                okText="Créer un ticket"
-                cancelText="Annuler la création"
+                okText="Create a job"
+                cancelText="Cancel"
               >
                 <Row>
                   <Col span={8}>
                     <Text type="secondary" style={{ fontSize: "20px" }}>
-                      L'intitulé:
+                      Title
                     </Text>
                   </Col>
                   <Col span={16}>
@@ -383,10 +500,10 @@ const Clients = () => {
                       onChange={(e) =>
                         setAddNew({
                           ...addNew,
-                          subject: e.target.value,
+                          title: e.target.value,
                         })
                       }
-                      value={addNew.subject}
+                      value={addNew.title}
                       style={{
                         width: "369px",
                         height: 30,
@@ -433,28 +550,145 @@ const Clients = () => {
                     />
                   </Col>
                 </Row>
+                <Row>
+                  <Col span={8}>
+                    <Text type="secondary" style={{ fontSize: "20px" }}>
+                      Estimated time
+                    </Text>
+                  </Col>
+                  <Col span={16}>
+                    {" "}
+                    <Input
+                      onChange={(e) =>
+                        setAddNew({
+                          ...addNew,
+                          estimated_time: e.target.value,
+                        })
+                      }
+                      type="number"
+                      value={addNew.estimated_time}
+                      style={{
+                        width: "369px",
+                        height: 30,
+                        marginBottom: 8,
+                        marginTop: 8,
+                        fontSize: "15px",
+                        display: "block",
+                      }}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <Text type="secondary" style={{ fontSize: "20px" }}>
+                      Initial price
+                    </Text>
+                  </Col>
+                  <Col span={16}>
+                    {" "}
+                    <Input
+                      onChange={(e) =>
+                        setAddNew({
+                          ...addNew,
+                          initial_price: e.target.value,
+                        })
+                      }
+                      type="number"
+                      value={addNew.initial_price}
+                      style={{
+                        width: "369px",
+                        height: 30,
+                        marginBottom: 8,
+                        marginTop: 8,
+                        fontSize: "15px",
+                        display: "block",
+                      }}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <Text type="secondary" style={{ fontSize: "20px" }}>
+                      Client price
+                    </Text>
+                  </Col>
+                  <Col span={16}>
+                    {" "}
+                    <Input
+                      onChange={(e) =>
+                        setAddNew({
+                          ...addNew,
+                          client_price: e.target.value,
+                        })
+                      }
+                      type="number"
+                      value={addNew.client_price}
+                      style={{
+                        width: "369px",
+                        height: 30,
+                        marginBottom: 8,
+                        marginTop: 8,
+                        fontSize: "15px",
+                        display: "block",
+                      }}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <Text type="secondary" style={{ fontSize: "20px" }}>
+                      Domain:
+                    </Text>
+                  </Col>
+                  <Col span={16}>
+                    <Select
+                      labelInValue
+                      onSelect={(e) =>
+                        setAddNew({
+                          ...addNew,
+                          domain: e.value,
+                        })
+                      }
+                      showSearch
+                      style={{
+                        width: "369px",
+                        height: 30,
+                        marginBottom: 8,
+                        marginTop: 8,
+                        fontSize: "15px",
+                        display: "block",
+                      }}
+                      placeholder="select a domain"
+                    >
+                      {fetchAllDomainsResult?.data?.map((d) => (
+                        <Select.Option key={d._id}>{d.name}</Select.Option>
+                      ))}
+                    </Select>
+                  </Col>
+                </Row>
               </Modal>
             )}
             <Row style={{ background: "#fff" }}>
-              <Table
-                pagination={false}
-                rowKey="_id"
-                tableLayout="fixed"
-                columns={columns}
-                dataSource={fetchTicketsResult?.result}
-                loading={isFetchingTickets}
-                style={{ padding: 24, minHeight: "100%" }}
-                // size="small"
-                //scroll={{ x: '100vw' }}
-              />
+              {isFetchingTickets ? (
+                <Skeleton active="true" />
+              ) : (
+                <Table
+                  pagination={false}
+                  rowKey="_id"
+                  tableLayout="fixed"
+                  columns={columns}
+                  dataSource={fetchAllJobsResult?.allJobs}
+                  loading={isFetchingTickets}
+                  style={{ padding: 24, minHeight: "100%" }}
+                  // size="small"
+                  //scroll={{ x: '100vw' }}
+                />
+              )}
             </Row>
           </Contt>
           <Footer style={{ marginTop: 10, background: "#fff" }}>
             <Row justify="end">
-              <Col>
-                Nombre total de tickets: {fetchTicketsResult?.result?.length}
-              </Col>
-              {console.log("length", fetchTicketsResult?.result?.length)}
+              <Col>All jobs: {fetchAllJobsResult?.allJobs?.length}</Col>
             </Row>
           </Footer>
         </Col>

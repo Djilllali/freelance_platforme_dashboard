@@ -1,14 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { ticketsUrl, readyTicketsUrl } from "../../Constants";
+import { getAlljobs, readyAllJobsUrl, CreateJobUrl } from "../../Constants";
 import axios from "axios";
 import { message } from "antd";
 import { act } from "@testing-library/react";
 
 const initState = {
-  fetchTicketsResult: null,
-  fetchTicketsError: null,
-  isFetchingTickets: false,
+  fetchAllJobsResult: null,
+  fetchAllJobsError: null,
+  isFetchingAllJobs: false,
   value: 2,
   pathname: "/",
   nbreOfDocs: 0,
@@ -16,29 +16,29 @@ const initState = {
   page: 1,
 };
 
-export const usersSlice = createSlice({
-  name: "Tickets",
+export const JobsSlice = createSlice({
+  name: "AllJobs",
   initialState: initState,
   reducers: {
     setPathname: (state, action) => {
       state.pathname = action.payload;
     },
-    setTicketsResult: (state, action) => {
-      state.fetchTicketsResult = action.payload;
+    setAllJobsResult: (state, action) => {
+      state.fetchAllJobsResult = action.payload;
       if (action.payload.nbreOfDocs)
         state.nbreOfDocs = action.payload.nbreOfDocs;
-      state.isFetchingTickets = false;
+      state.isFetchingAllJobs = false;
     },
-    setTicketsError: (state, action) => {
-      state.fetchTicketsError = action.payload;
-      state.isFetchingTickets = false;
+    setAllJobsError: (state, action) => {
+      state.fetchAllJobsError = action.payload;
+      state.isFetchingAllJobs = false;
     },
-    setFetchingTickets: (state, action) => {
+    setFetchingAllJobs: (state, action) => {
       if (action.payload) {
-        state.fetchTicketsError = null;
-        state.fetchTicketsResult = null;
+        state.fetchAllJobsError = null;
+        state.fetchAllJobsResult = null;
       }
-      state.isFetchingTickets = action.payload;
+      state.isFetchingAllJobs = action.payload;
     },
     setFilters: (state, action) => {
       state.filters = action.payload;
@@ -51,41 +51,41 @@ export const usersSlice = createSlice({
 
 export const {
   setPathname,
-  setTicketsResult,
-  setTicketsError,
-  setFetchingTickets,
+  setAllJobsResult,
+  setAllJobsError,
+  setFetchingAllJobs,
   setFilters,
   setPage,
-} = usersSlice.actions;
+} = JobsSlice.actions;
 
-export const fetchTickets = (data) => (dispatch, getState) => {
+export const fetchAllJobs = (data) => (dispatch, getState) => {
   const config = {
     method: "get",
-    url: readyTicketsUrl,
+    url: getAlljobs,
     headers: {
       "Content-Type": "application/json",
       Authorization: localStorage.token,
     },
     data,
   };
-  dispatch(setFetchingTickets(true));
+  dispatch(setFetchingAllJobs(true));
 
   const response = axios(config)
     .then((response) => {
-      dispatch(setTicketsResult(response.data));
+      dispatch(setAllJobsResult(response.data));
     })
     .catch((response) => {
-      dispatch(setTicketsError(response.message));
+      dispatch(setAllJobsError(response.message));
     });
 
   return response.data;
 };
 // --------------------------------------------
 // --------------------------------------------
-export const AddnewTicket = (data) => async (dispatch, getState) => {
+export const AddnewJob = (data) => async (dispatch, getState) => {
   const config = {
     method: "post",
-    url: ticketsUrl,
+    url:CreateJobUrl,
     headers: {
       "Content-Type": "application/json",
       Authorization: localStorage.token,
@@ -95,11 +95,11 @@ export const AddnewTicket = (data) => async (dispatch, getState) => {
 
   const response = await axios(config)
     .then((response) => {
-      message.success("Ticket added successfully");
-      dispatch(fetchTickets());
+      message.success("Job added successfully");
+      dispatch(fetchAllJobs());
     })
     .catch((response) => {
-      message.error("Error while adding the ticket ");
+      message.error("Error while adding the job ");
     });
 
   return response;
@@ -109,4 +109,4 @@ export const AddnewTicket = (data) => async (dispatch, getState) => {
 
 export const selectCount = (state) => state.dashboard.value;
 
-export default usersSlice.reducer;
+export default JobsSlice.reducer;
