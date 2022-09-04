@@ -249,7 +249,7 @@ const Clients = () => {
                   }}
                 />
               )}
-            </Descriptions.Item>           
+            </Descriptions.Item>
             <Descriptions.Item label="Client price">
               {!addNew.edit ? (
                 fetchSingleJobResult?.oneJob?.client_price
@@ -343,47 +343,53 @@ const Clients = () => {
       <br></br>
       <Row>
         <Col offset={10}>
-          <Button
-            size="large"
-            type="primary"
-            onClick={() =>
-              setAddNew({
-                ...addNew,
-                edit: true,
-                title: fetchSingleJobResult?.oneJob?.title,
-                description: fetchSingleJobResult?.oneJob?.description,
-                estimated_time: fetchSingleJobResult?.oneJob?.estimated_time,
-                domain: fetchSingleJobResult?.oneJob?.domain?._id,
-                initial_price: fetchSingleJobResult?.oneJob?.initial_price,
-                client_price: fetchSingleJobResult?.oneJob?.client_price,
-                status: fetchSingleJobResult?.oneJob?.status,
-                deadline: fetchSingleJobResult?.oneJob?.deadline,
-              })
-            }
-          >
-            Edit job
-          </Button>
+          {!addNew.edit && (
+            <Button
+              size="large"
+              type="primary"
+              onClick={() =>
+                setAddNew({
+                  ...addNew,
+                  edit: true,
+                  title: fetchSingleJobResult?.oneJob?.title,
+                  description: fetchSingleJobResult?.oneJob?.description,
+                  estimated_time: fetchSingleJobResult?.oneJob?.estimated_time,
+                  domain: fetchSingleJobResult?.oneJob?.domain?._id,
+                  initial_price: fetchSingleJobResult?.oneJob?.initial_price,
+                  client_price: fetchSingleJobResult?.oneJob?.client_price,
+                  status: fetchSingleJobResult?.oneJob?.status,
+                  deadline: fetchSingleJobResult?.oneJob?.deadline,
+                })
+              }
+            >
+              Edit job
+            </Button>
+          )}
         </Col>
 
         <Col offset={1}>
-          <Button size="large" type="primary" onClick={handleaddNew}>
-            Update
-          </Button>
+          {addNew.edit && (
+            <Button size="large" type="primary" onClick={handleaddNew}>
+              Update
+            </Button>
+          )}
         </Col>
 
         <Col offset={1}>
-          <Button
-            size="large"
-            type="primary"
-            onClick={() =>
-              setAddNew({
-                ...addNew,
-                edit: false,
-              })
-            }
-          >
-            Cancel
-          </Button>
+          {addNew.edit && (
+            <Button
+              size="large"
+              type="primary"
+              onClick={() =>
+                setAddNew({
+                  ...addNew,
+                  edit: false,
+                })
+              }
+            >
+              Cancel
+            </Button>
+          )}
         </Col>
       </Row>
       <br></br> <br></br>
