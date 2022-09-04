@@ -118,7 +118,7 @@ export const {
 
 export const fetchAllUsers = (data) => (dispatch, getState) => {
   const config = {
-    method: "get",
+    method: "post",
     url: getAllUsers,
     headers: {
       "Content-Type": "application/json",
@@ -143,7 +143,7 @@ export const fetchAllUsers = (data) => (dispatch, getState) => {
 // --------------------------------------------
 export const fetchAllDomains = (data) => (dispatch, getState) => {
   const config = {
-    method: "get",
+    method: "post",
     url: getAllDomainsUrl,
     headers: {
       "Content-Type": "application/json",
@@ -167,7 +167,7 @@ export const fetchAllDomains = (data) => (dispatch, getState) => {
 // --------------------------------------------
 export const fetchAllPacks = (data) => (dispatch, getState) => {
   const config = {
-    method: "get",
+    method: "post",
     url: getAllPacksUrl,
     headers: {
       "Content-Type": "application/json",

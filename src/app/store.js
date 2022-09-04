@@ -4,6 +4,7 @@ import usersReducer from "../features/users/usersSlice";
 import jobsReducer from "../features/jobs/jobsSlice";
 import dashboardReducer from "../features/dashboard/dashboardSlice";
 import singleUser from "../features/user/userSlice";
+import singleJob from "../features/single-job/jobSlice";
 
 export default configureStore({
   reducer: {
@@ -11,5 +12,6 @@ export default configureStore({
     users: usersReducer,
     dashboard: dashboardReducer,
     jobs: jobsReducer,
+    job: singleJob,
   },
 });

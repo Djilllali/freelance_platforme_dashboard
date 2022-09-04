@@ -33,6 +33,7 @@ import { setredirectToDashboard } from "../signin/signinSlice";
 import { Content } from "antd/lib/layout/layout";
 import users from "../users/users";
 import Jobs from "../jobs/jobs";
+import Job from "../single-job/job";
 
 const { Header, Footer, Sider } = Layout;
 const { Text } = Typography;
@@ -295,9 +296,10 @@ let Dashboard = ({}) => {
             />
             <Route
               exact
-              path="/dashboard/users/termine"
-              component={Termineusers}
+              path="/dashboard/jobs/:_id"
+              component={Job}
             /> */}
+            <Route exact path="/dashboard/allJobs/:_id" component={Job} />
             <Route exact path="/dashboard/allJobs" component={Jobs} />
             <Route exact path="/dashboard/" />
           </Switch>

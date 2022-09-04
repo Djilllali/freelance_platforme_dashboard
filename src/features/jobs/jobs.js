@@ -14,16 +14,24 @@ import {
   Tag,
   message,
   Skeleton,
+  Alert,
+  Upload,
 } from "antd";
 import Modal from "antd/lib/modal/Modal";
 import {
   SearchOutlined,
   PlusOutlined,
-  EditOutlined,
+  UploadOutlined,
   CheckCircleOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllJobs, AddnewJob, setFilters, setPage } from "./jobsSlice";
+import {
+  fetchAllJobs,
+  AddnewJob,
+  setFilters,
+  setPage,
+  fetchUploadZipFile,
+} from "./jobsSlice";
 import { fetchAllDomains } from "../users/usersSlice";
 import Highlighter from "react-highlight-words";
 import Title from "antd/lib/skeleton/Title";
@@ -68,6 +76,9 @@ const Clients = () => {
   const fetchAllDomainsResult = useSelector(
     (state) => state.users.fetchAllDomainsResult
   );
+  const fetchuploadresult = useSelector(
+    (state) => state.jobs.fetchUploadZipFileResult
+  );
   let searchInput = useRef(null);
   const toggleswitched = (e) => {
     setState({ ...state, switcher: e });
@@ -86,6 +97,7 @@ const Clients = () => {
     client_price: "",
     domain: "",
     visible: false,
+    file: "",
   });
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
@@ -330,19 +342,7 @@ const Clients = () => {
             <Button
               type="primary"
               icon={<PlusOutlined />}
-              onClick={() =>
-                setAddNew({
-                  ...addNew,
-                  visible: true,
-                  update: true,
-                  _id: e._id,
-                  name: e.name,
-                  email: e.email,
-                  phone: e.phone,
-                  domain: e.domain._id,
-                  pack: e.pack._id,
-                })
-              }
+              onClick={() => history.push("/dashboard/allJobs/" + e._id)}
             >
               Edit Job
             </Button>
@@ -374,26 +374,24 @@ const Clients = () => {
     }
   }
 
-  // const uploadProps = {
-  //   onRemove: (file) => {
-  //     const index = state.fileList.indexOf(file);
-  //     const newFileList = state.fileList.slice();
-  //     newFileList.splice(index, 1);
-  //     setState({ ...state, fileList: newFileList });
-  //   },
-  //   beforeUpload: (file) => {
-  //     // setState({
-  //     //   ...state,
-  //     //   fileList: [...state.fileList, file],
-  //     // });
-  //     console.log("============  uploaaaaaad");
-  //     dispatch(
-  //       fetchUploadCategoryImage({ categoryImage: editCategory._id }, file)
-  //     );
-  //     return false;
-  //   },
-  //   fileList: state.fileList,
-  // };
+  const uploadProps = {
+    onRemove: (file) => {
+      const index = state.fileList.indexOf(file);
+      const newFileList = state.fileList.slice();
+      newFileList.splice(index, 1);
+      setState({ ...state, fileList: newFileList });
+    },
+    beforeUpload: (file) => {
+      // setState({
+      //   ...state,
+      //   fileList: [...state.fileList, file],
+      // });
+      dispatch(fetchUploadZipFile(file));
+      return false;
+    },
+    fileList: state.fileList,
+  };
+  console.log("fetchuploadresult", fetchuploadresult);
   const handleaddNew = () => {
     console.log("addnew", addNew);
     if (
@@ -411,7 +409,7 @@ const Clients = () => {
 
       delete my_edit.visible;
 
-      dispatch(AddnewJob({ ...my_edit }));
+      dispatch(AddnewJob({ ...my_edit, file: fetchuploadresult }));
       setAddNew({ ...addNew, visible: false });
     }
   };
@@ -664,6 +662,42 @@ const Clients = () => {
                         <Select.Option key={d._id}>{d.name}</Select.Option>
                       ))}
                     </Select>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <Text type="secondary" style={{ fontSize: "20px" }}>
+                      Upload file:
+                    </Text>
+                  </Col>
+                  <Col span={16}>
+                    <Upload {...uploadProps}>
+                      <div
+                        className="file file--upload"
+                        style={{
+                          border: "1px ridge green",
+                          borderRadius: "4px",
+                          backgroundColor: "#93edb6",
+                          padding: "20px",
+                        }}
+                      >
+                        <label for="input-file">
+                          <UploadOutlined />
+                          <span className="tab"> Ratacher le fichier .zip</span>
+                        </label>
+                      </div>
+                    </Upload>
+                    {fetchuploadresult && (
+                      <Alert
+                        message="Votre fichier zip a été uploadé avec succès !"
+                        type="success"
+                        description={
+                          "le nouveau nom du fichier est: " + fetchuploadresult
+                        }
+                        showIcon
+                        closable
+                      />
+                    )}
                   </Col>
                 </Row>
               </Modal>

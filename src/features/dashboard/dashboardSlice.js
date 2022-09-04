@@ -39,7 +39,7 @@ export const {
 
 export const fetchUserProfile = () => (dispatch, getState) => {
   const config = {
-    method: "get",
+    method: "post",
     url: profile_url,
     headers: {
       Authorization: localStorage.token,

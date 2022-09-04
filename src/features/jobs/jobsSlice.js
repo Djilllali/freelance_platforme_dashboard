@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { getAlljobs, readyAllJobsUrl, CreateJobUrl } from "../../Constants";
+import { getAlljobs, readyAllJobsUrl, CreateJobUrl, uploadZipFileUrl } from "../../Constants";
 import axios from "axios";
 import { message } from "antd";
 import { act } from "@testing-library/react";
@@ -9,6 +9,9 @@ const initState = {
   fetchAllJobsResult: null,
   fetchAllJobsError: null,
   isFetchingAllJobs: false,
+  fetchUploadZipFileResult: null,
+  fetchUploadZipFileError: null,
+  isFetchingUploadZipFile: false,
   value: 2,
   pathname: "/",
   nbreOfDocs: 0,
@@ -40,6 +43,21 @@ export const JobsSlice = createSlice({
       }
       state.isFetchingAllJobs = action.payload;
     },
+    setUploadZipFileResult: (state, action) => {
+      state.fetchUploadZipFileResult = action.payload;
+      state.isFetchingUploadZipFile = false;
+    },
+    setUploadZipFileError: (state, action) => {
+      state.fetchUploadZipFileError = action.payload;
+      state.isFetchingUploadZipFile = false;
+    },
+    setFetchingUploadZipFile: (state, action) => {
+      if (action.payload) {
+        state.fetchUploadZipFileResult = null;
+        state.fetchUploadZipFileError = null;
+      }
+      state.isFetchingUploadZipFile = action.payload;
+    },
     setFilters: (state, action) => {
       state.filters = action.payload;
     },
@@ -54,13 +72,16 @@ export const {
   setAllJobsResult,
   setAllJobsError,
   setFetchingAllJobs,
+  setUploadZipFileResult,
+  setUploadZipFileError,
+  setFetchingUploadZipFile,
   setFilters,
   setPage,
 } = JobsSlice.actions;
 
 export const fetchAllJobs = (data) => (dispatch, getState) => {
   const config = {
-    method: "get",
+    method: "post",
     url: getAlljobs,
     headers: {
       "Content-Type": "application/json",
@@ -106,7 +127,39 @@ export const AddnewJob = (data) => async (dispatch, getState) => {
 };
 // ---------------------------------------------------------------------
 // --------------------------------------------------------------------
+export const fetchUploadZipFile = (file) => (dispatch, getState) => {
+  let formData = new FormData();
+  formData.append("upload", file);
 
+  const config = {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: localStorage.token,
+    },
+  };
+
+  dispatch(setFetchingUploadZipFile(true));
+  let url = uploadZipFileUrl;
+  let response = axios
+    .post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: localStorage.token,
+      },
+    })
+    .then((response) => {
+      dispatch(setUploadZipFileResult(response.data.path));
+      message.success("Votre fichier zip a été uploadé avec succès !");
+    })
+    .catch((response) => {
+      dispatch(setUploadZipFileError(response.message));
+      console.log("slice error");
+    });
+
+  return response.data;
+};
+// ---------------------------------------------------------------------
+// --------------------------------------------------------------------
 export const selectCount = (state) => state.dashboard.value;
 
 export default JobsSlice.reducer;
