@@ -14,27 +14,26 @@ import {
   Tag,
   message,
   Skeleton,
-  Divider,
+  Alert,
+  Upload,
+  Cascader,
 } from "antd";
-import { InputRef } from "antd";
 import Modal from "antd/lib/modal/Modal";
 import {
   SearchOutlined,
   PlusOutlined,
-  EditOutlined,
+  UploadOutlined,
   CheckCircleOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchAllUsers,
-  fetchAllDomains,
-  fetchAllPacks,
-  CreateUser,
+  fetchAllJobs,
+  AddnewJob,
   setFilters,
   setPage,
-  UpdateUser,
-  VerifyUser,
-} from "./usersSlice";
+  fetchUploadZipFile,
+} from "./domainsSlice";
+import { fetchAllDomains } from "../users/usersSlice";
 import Highlighter from "react-highlight-words";
 import Title from "antd/lib/skeleton/Title";
 import { Switch } from "react-router-dom";
@@ -62,26 +61,25 @@ const Clients = () => {
   let history = useHistory();
   const [state, setState] = useState({});
   const { useEffect } = React;
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchAllUsers());
     dispatch(fetchAllDomains());
-    dispatch(fetchAllPacks());
   }, []);
-  const [searchText, setSearchText] = useState("");
-  const [searchedColumn, setSearchedColumn] = useState("");
+
   const isFetchingTickets = useSelector(
-    (state) => state.users?.isFetchingAllUsers
+    (state) => state.jobs?.isFetchingAllJobs
   );
-  const fetchAllUsersResult = useSelector(
-    (state) => state.users.fetchAllUsersResult
+  const fetchAllJobsResult = useSelector(
+    (state) => state.jobs.fetchAllJobsResult
   );
   const fetchAllDomainsResult = useSelector(
     (state) => state.users.fetchAllDomainsResult
   );
-  const fetchAllPacksResult = useSelector(
-    (state) => state.users.fetchAllPacksResult
+  const fetchuploadresult = useSelector(
+    (state) => state.jobs.fetchUploadZipFileResult
   );
   let searchInput = useRef(null);
   const toggleswitched = (e) => {
@@ -93,16 +91,16 @@ const Clients = () => {
   const { Option } = Select;
 
   const [addNew, setAddNew] = React.useState({
-    name: "",
-    email: "",
-    password: "",
-    phone: "",
+    title: "",
+    description: "",
+    deadline: "",
+    estimated_time: "",
+    initial_price: "",
+    client_price: "",
     domain: "",
-    pack: "",
-    update: false,
-    _id: "",
+    visible: false,
+    file: "",
   });
-
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -167,6 +165,7 @@ const Clients = () => {
               confirm({
                 closeDropdown: false,
               });
+              console.log("selectedKeys[0]", selectedKeys[0], dataIndex);
               setSearchText(selectedKeys[0]);
               setSearchedColumn(dataIndex);
             }}
@@ -205,6 +204,7 @@ const Clients = () => {
         text
       ),
   });
+
   const columns = [
     {
       title: "Name",
@@ -214,188 +214,14 @@ const Clients = () => {
       align: "center",
       ...getColumnSearchProps("name"),
     },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      width: "40%",
-      align: "left",
-      ...getColumnSearchProps("email"),
-    },
-    {
-      title: "Phone",
-      dataIndex: "phone",
-      key: "phone",
-      width: "25%",
-      align: "center",
-      ...getColumnSearchProps("phone"),
-    },
-    // {
-    //   title: "Date de création",
-    //   dataIndex: "openAt",
-    //   key: "openAt",
-    //   width: "25%",
-    //   align: "center",
-    //   render: (text) => {
-    //     return moment(text).format("DD/MM/yyyy");
-    //   },
-    // },
-
-    {
-      title: "Domain",
-      dataIndex: "domain",
-      key: "domain.name",
-      width: "35%",
-      align: "center",
-      filters: [
-        {
-          text: "Business",
-          value: "Business",
-        },
-        {
-          text: "Ingenierie",
-          value: "Ingenierie",
-        },
-        {
-          text: "Medical",
-          value: "Medical",
-        },
-        {
-          text: "Informatique",
-          value: "Informatique",
-        },
-      ],
-
-      filterMultiple: false,
-      onFilter: (value, record) => record.domain?.name?.indexOf(value) === 0,
-
-      filterSearch: true,
-      render: (text) => {
-        const colors = {
-          Business: "green",
-          Ingenierie: "purple",
-          Medical: "yellow",
-          Informatique: "blue",
-        };
-        return text?.name;
-      },
-    },
-    {
-      title: "Pack",
-      dataIndex: "pack",
-      key: "pack.name",
-      width: "25%",
-      align: "center",
-      filters: [
-        {
-          text: "Relax",
-          value: "relax",
-        },
-        {
-          text: "Pro",
-          value: "pro",
-        },
-        {
-          text: "Promax",
-          value: "promax",
-        },
-        {
-          text: "Freelancer",
-          value: "freelancer",
-        },
-      ],
-
-      filterMultiple: false,
-      onFilter: (value, record) => record.pack?.name.indexOf(value) === 0,
-
-      filterSearch: true,
-      render: (text) => {
-        const colors = {
-          relax: "green",
-          pro: "purple",
-          promax: "yellow",
-          freelancer: "blue",
-        };
-        return <Tag color={colors[text?.name]}>{text?.name}</Tag>;
-      },
-    },
-    {
-      title: "Status",
-      dataIndex: "verified",
-      key: "verified",
-      align: "center",
-      width: "25%",
-      filters: [
-        {
-          text: "verified",
-          value: true,
-        },
-        {
-          text: "unverified",
-          value: false,
-        },
-      ],
-
-      filterMultiple: false,
-      onFilter: (value, record) => record.verified === value,
-      filterSearch: true,
-      render: (verified) => {
-        const colors = {
-          true: "green",
-          false: "red",
-        };
-        return verified ? (
-          <Tag color={colors[verified]}>VERIFIED</Tag>
-        ) : (
-          <Tag color={colors[verified]}>NOT VERIFIED</Tag>
-        );
-      },
-    },
-    {
-      title: "plus",
-      align: "center",
-      width: "45%",
-
-      render: (e) => {
-        return (
-          <div>
-            <Button
-              type="primary"
-              onClick={() => {
-                setAddNew({
-                  ...addNew,
-                  _id: e._id,
-                  name: e.name,
-                  email: e.email,
-                  phone: e.phone,
-                  domain: e?.domain?._id,
-                  pack: e?.pack?._id,
-                  visible: true,
-                  update: true,
-                });
-              }}
-              style={{ marginRight: 10 }}
-            >
-              Edit user
-            </Button>
-
-            <Button
-              type="primary"
-              onClick={() => dispatch(VerifyUser({ _id: e._id }))}
-            >
-              Verify user
-            </Button>
-          </div>
-        );
-      },
-    },
+   
   ];
   function onChange(pagination, filters, sorter, extra, from_date, to_date) {
     if (!from_date) {
       dispatch(setFilters(filters));
       dispatch(setPage(1));
       dispatch(
-        fetchAllUsers({
+        fetchAllJobs({
           ...filters,
           page: 1,
         })
@@ -405,7 +231,7 @@ const Clients = () => {
       dispatch(setPage(1));
 
       dispatch(
-        fetchAllUsers({
+        fetchAllJobs({
           ...filters,
           page: 1,
         })
@@ -425,49 +251,41 @@ const Clients = () => {
   //     //   ...state,
   //     //   fileList: [...state.fileList, file],
   //     // });
-  //     console.log("============  uploaaaaaad");
-  //     dispatch(
-  //       fetchUploadCategoryImage({ categoryImage: editCategory._id }, file)
-  //     );
+  //     dispatch(fetchUploadZipFile(file));
   //     return false;
   //   },
   //   fileList: state.fileList,
   // };
+  console.log("fetchuploadresult", fetchuploadresult);
   const handleaddNew = () => {
-    if (!addNew.update) {
-      if (
-        addNew.name === "" ||
-        addNew.email === "" ||
-        addNew.password === "" ||
-        addNew.phone === "" ||
-        addNew.domain === "" ||
-        addNew.pack === ""
-      ) {
-        message.error("Merci de compléter tous les champs!");
-      } else {
-        let my_edit = addNew;
+    console.log("addnew", addNew);
+    // if (
+    //   !addNew.title === "" ||
+    //   !addNew.description === "" ||
+    //   !addNew.deadline === "" ||
+    //   !addNew.estimated_time === "" ||
+    //   !addNew.initial_price === "" ||
+    //   !addNew.client_price === "" ||
+    //   !addNew.domain
+    // ) {
+    //   message.error("Merci de compléter tous les champs!");
+    // } else {
+    //   let my_edit = addNew;
 
-        delete my_edit.visible;
-        delete my_edit.update;
-        delete my_edit._id;
+    //   delete my_edit.visible;
 
-        dispatch(CreateUser({ ...my_edit }));
-      }
-    } else {
-      let my_edit = addNew;
-      delete my_edit.visible;
-      delete my_edit.update;
-      dispatch(UpdateUser({ ...my_edit }));
-    }
-    setAddNew({ ...addNew, visible: false, update: false });
+    //   dispatch(AddnewJob({ ...my_edit, file: fetchuploadresult }));
+    //   setAddNew({ ...addNew, visible: false });
+    // }
   };
   const getDateValue = (dateString) => {
-    setAddNew({ ...addNew, deadline: dateString });
+    let date = moment(dateString._d).format("DD/MM/yyyy");
+    setAddNew({ ...addNew, deadline: date });
   };
   const checkNotifications = () => {
-    fetchAllUsersResult?.data?.map((element) =>
+    fetchAllJobsResult?.allJobs?.map((element) =>
       notification.info({
-        message: element.name,
+        message: element?.name,
         description:
           'Le ticket " ' +
           element.subject +
@@ -494,15 +312,13 @@ const Clients = () => {
                 margin: "8px 0px",
               }}
             >
-              <h1 style={{ fontSize: "35px" }}> All users list</h1>
+              <h1 style={{ fontSize: "35px" }}> All Jobs list</h1>
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
-                onClick={() =>
-                  setAddNew({ ...addNew, visible: true, update: false })
-                }
+                onClick={() => setAddNew({ ...addNew, visible: true })}
               >
-                Create a user
+                Create a new job
               </Button>
               <span className="tab">
                 {" "}
@@ -526,19 +342,19 @@ const Clients = () => {
 
             {addNew?.visible && (
               <Modal
-                title={addNew.update ? "UPDATE" : "CREATE"}
+                title={"NEW JOB"}
                 centered
                 visible={addNew?.visible}
                 onOk={handleaddNew}
                 onCancel={() => setAddNew({ ...addNew, visible: false })}
                 width={600}
-                okText={addNew.update ? "Update user" : "create a user"}
-                cancelText="cancel creation"
+                okText="Create a job"
+                cancelText="Cancel"
               >
                 <Row>
                   <Col span={8}>
                     <Text type="secondary" style={{ fontSize: "20px" }}>
-                      Name:
+                      Title
                     </Text>
                   </Col>
                   <Col span={16}>
@@ -547,10 +363,10 @@ const Clients = () => {
                       onChange={(e) =>
                         setAddNew({
                           ...addNew,
-                          name: e.target.value,
+                          title: e.target.value,
                         })
                       }
-                      value={addNew.name}
+                      value={addNew.title}
                       style={{
                         width: "369px",
                         height: 30,
@@ -565,64 +381,42 @@ const Clients = () => {
                 <Row>
                   <Col span={8}>
                     <Text type="secondary" style={{ fontSize: "20px" }}>
-                      email:
+                      Déscription:
                     </Text>
                   </Col>
                   <Col span={16}>
                     {" "}
-                    <Input
+                    <TextArea
+                      rows={4}
                       onChange={(e) =>
                         setAddNew({
                           ...addNew,
-                          email: e.target.value,
+                          description: e.target.value,
                         })
                       }
-                      type="email"
-                      value={addNew.email}
-                      style={{
-                        width: "369px",
-                        height: 30,
-                        marginBottom: 8,
-                        marginTop: 8,
-                        fontSize: "15px",
-                        display: "block",
-                      }}
+                      //value={addIdentity?.slug}
+                      value={addNew.description}
                     />
                   </Col>
                 </Row>
-                {!addNew.update && (
-                  <Row>
-                    <Col span={8}>
-                      <Text type="secondary" style={{ fontSize: "20px" }}>
-                        Password:
-                      </Text>
-                    </Col>
-                    <Col span={16}>
-                      {" "}
-                      <Input
-                        onChange={(e) =>
-                          setAddNew({
-                            ...addNew,
-                            password: e.target.value,
-                          })
-                        }
-                        type="password"
-                        style={{
-                          width: "369px",
-                          height: 30,
-                          marginBottom: 8,
-                          marginTop: 8,
-                          fontSize: "15px",
-                          display: "block",
-                        }}
-                      />
-                    </Col>
-                  </Row>
-                )}
+                <Row>
+                  <Col span={8} style={{ marginTop: 8 }}>
+                    <Text type="secondary" style={{ fontSize: "20px" }}>
+                      Deadline:
+                    </Text>
+                  </Col>
+                  <Col span={16}>
+                    {" "}
+                    <DatePicker
+                      style={{ marginTop: 8 }}
+                      onChange={getDateValue}
+                    />
+                  </Col>
+                </Row>
                 <Row>
                   <Col span={8}>
                     <Text type="secondary" style={{ fontSize: "20px" }}>
-                      Phone:
+                      Estimated time
                     </Text>
                   </Col>
                   <Col span={16}>
@@ -631,11 +425,11 @@ const Clients = () => {
                       onChange={(e) =>
                         setAddNew({
                           ...addNew,
-                          phone: e.target.value,
+                          estimated_time: e.target.value,
                         })
                       }
-                      type="tel"
-                      value={addNew.phone}
+                      type="number"
+                      value={addNew.estimated_time}
                       style={{
                         width: "369px",
                         height: 30,
@@ -647,7 +441,62 @@ const Clients = () => {
                     />
                   </Col>
                 </Row>
-
+                <Row>
+                  <Col span={8}>
+                    <Text type="secondary" style={{ fontSize: "20px" }}>
+                      Initial price
+                    </Text>
+                  </Col>
+                  <Col span={16}>
+                    {" "}
+                    <Input
+                      onChange={(e) =>
+                        setAddNew({
+                          ...addNew,
+                          initial_price: e.target.value,
+                        })
+                      }
+                      type="number"
+                      value={addNew.initial_price}
+                      style={{
+                        width: "369px",
+                        height: 30,
+                        marginBottom: 8,
+                        marginTop: 8,
+                        fontSize: "15px",
+                        display: "block",
+                      }}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={8}>
+                    <Text type="secondary" style={{ fontSize: "20px" }}>
+                      Client price
+                    </Text>
+                  </Col>
+                  <Col span={16}>
+                    {" "}
+                    <Input
+                      onChange={(e) =>
+                        setAddNew({
+                          ...addNew,
+                          client_price: e.target.value,
+                        })
+                      }
+                      type="number"
+                      value={addNew.client_price}
+                      style={{
+                        width: "369px",
+                        height: 30,
+                        marginBottom: 8,
+                        marginTop: 8,
+                        fontSize: "15px",
+                        display: "block",
+                      }}
+                    />
+                  </Col>
+                </Row>
                 <Row>
                   <Col span={8}>
                     <Text type="secondary" style={{ fontSize: "20px" }}>
@@ -655,67 +504,64 @@ const Clients = () => {
                     </Text>
                   </Col>
                   <Col span={16}>
-                    <Select
-                      labelInValue
-                      onSelect={(e) =>
+                    <Cascader
+                      placeholder="Please select"
+                      onChange={(e) =>
                         setAddNew({
                           ...addNew,
-                          domain: e.value,
+                          domain: e,
                         })
                       }
-                      showSearch
-                      style={{
-                        width: "369px",
-                        height: 30,
-                        marginBottom: 8,
-                        marginTop: 8,
-                        fontSize: "15px",
-                        display: "block",
-                      }}
-                      placeholder="select a domain"
-                    >
-                      {fetchAllDomainsResult?.data?.map((d) => (
-                        <Select.Option key={d._id}>{d.name}</Select.Option>
-                      ))}
-                    </Select>
+                      options={fetchAllDomainsResult?.data?.map((el) => ({
+                        value: el._id,
+                        label: el.name,
+                        children: el.subdomains?.map((dom) => ({
+                          label: dom.name,
+                          value: dom._id,
+                        })),
+                      }))}
+                    ></Cascader>
                   </Col>
                 </Row>
-                <Row>
+                {/* <Row>
                   <Col span={8}>
                     <Text type="secondary" style={{ fontSize: "20px" }}>
-                      Pack:
+                      Upload file:
                     </Text>
                   </Col>
                   <Col span={16}>
-                    <Select
-                      labelInValue
-                      onSelect={(e) =>
-                        setAddNew({
-                          ...addNew,
-                          pack: e.value,
-                        })
-                      }
-                      showSearch
-                      style={{
-                        width: "369px",
-                        height: 30,
-                        marginBottom: 8,
-                        marginTop: 8,
-                        fontSize: "15px",
-                        display: "block",
-                      }}
-                      placeholder="select a pack"
-                    >
-                      {fetchAllPacksResult?.data?.map((d) => (
-                        <Select.Option key={d._id}>{d.name}</Select.Option>
-                      ))}
-                    </Select>
+                    <Upload {...uploadProps}>
+                      <div
+                        className="file file--upload"
+                        style={{
+                          border: "1px ridge green",
+                          borderRadius: "4px",
+                          backgroundColor: "#93edb6",
+                          padding: "20px",
+                        }}
+                      >
+                        <label for="input-file">
+                          <UploadOutlined />
+                          <span className="tab"> Ratacher le fichier .zip</span>
+                        </label>
+                      </div>
+                    </Upload>
+                    {fetchuploadresult && (
+                      <Alert
+                        message="Votre fichier zip a été uploadé avec succès !"
+                        type="success"
+                        description={
+                          "le nouveau nom du fichier est: " + fetchuploadresult
+                        }
+                        showIcon
+                        closable
+                      />
+                    )}
                   </Col>
-                </Row>
+                </Row> */}
               </Modal>
             )}
             <Row style={{ background: "#fff" }}>
-              {console.log("is fetchhing", isFetchingTickets)}
               {isFetchingTickets ? (
                 <Skeleton active="true" />
               ) : (
@@ -724,7 +570,7 @@ const Clients = () => {
                   rowKey="_id"
                   tableLayout="fixed"
                   columns={columns}
-                  dataSource={fetchAllUsersResult?.data}
+                  dataSource={fetchAllDomainsResult?.data}
                   loading={isFetchingTickets}
                   style={{ padding: 24, minHeight: "100%" }}
                   // size="small"
@@ -735,7 +581,7 @@ const Clients = () => {
           </Contt>
           <Footer style={{ marginTop: 10, background: "#fff" }}>
             <Row justify="end">
-              <Col>All users: {fetchAllUsersResult?.data?.length}</Col>
+              <Col>All jobs: {fetchAllDomainsResult?.data.length}</Col>
             </Row>
           </Footer>
         </Col>

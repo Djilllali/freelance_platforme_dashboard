@@ -58,6 +58,8 @@ const Contt = ({ children, extra }) => {
 const { RangePicker } = DatePicker;
 const Clients = () => {
   let history = useHistory();
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
   const [state, setState] = useState({});
   const { useEffect } = React;
   const dispatch = useDispatch();
@@ -99,6 +101,17 @@ const Clients = () => {
     visible: false,
     file: "",
   });
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
+  };
+
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -106,18 +119,23 @@ const Clients = () => {
       confirm,
       clearFilters,
     }) => (
-      <div style={{ padding: 8 }}>
+      <div
+        style={{
+          padding: 8,
+        }}
+      >
         <Input
-          ref={(node) => {
-            searchInput = node;
-          }}
+          ref={searchInput}
           placeholder={`Search ${dataIndex}`}
-          value={selectedKeys}
-          onChange={(e) => {
-            setSelectedKeys([e.target.value] ? [e.target.value] : "");
-          }}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
           onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-          style={{ width: 188, marginBottom: 8, display: "block" }}
+          style={{
+            marginBottom: 8,
+            display: "block",
+          }}
         />
         <Space>
           <Button
@@ -125,51 +143,66 @@ const Clients = () => {
             onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
             size="small"
-            style={{ width: 90 }}
+            style={{
+              width: 90,
+            }}
           >
             Search
           </Button>
           <Button
-            onClick={() => handleReset(clearFilters)}
+            onClick={() => clearFilters && handleReset(clearFilters)}
             size="small"
-            style={{ width: 90 }}
+            style={{
+              width: 90,
+            }}
           >
             Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({
+                closeDropdown: false,
+              });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filter
           </Button>
         </Space>
       </div>
     ),
     filterIcon: (filtered) => (
-      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+      <SearchOutlined
+        style={{
+          color: filtered ? "#1890ff" : undefined,
+        }}
+      />
     ),
-    onFilterDropdownVisibleChange: (visible) => {
+    onFilter: (value, record) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownOpenChange: (visible) => {
       if (visible) {
-        setTimeout(() => searchInput.select(), 100);
+        setTimeout(() => searchInput.current?.select(), 100);
       }
     },
-    render: (text) => {
-      if (state.searchedColumn === dataIndex)
-        return (
-          <Highlighter
-            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-            searchWords={[state.searchText]}
-            autoEscape
-            textToHighlight={text ? text.toString() : ""}
-          />
-        );
-      else return text;
-    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{
+            backgroundColor: "#ffc069",
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ""}
+        />
+      ) : (
+        text
+      ),
   });
-
-  const handleSearch = (selectedKeys, confirm, dataIndex) => {
-    confirm();
-    setState({ searchedColumn: dataIndex, searchText: selectedKeys[0] });
-  };
-
-  const handleReset = (clearFilters) => {
-    clearFilters();
-    setState({ ...state, searchText: "" });
-  };
 
   const columns = [
     {
@@ -178,6 +211,7 @@ const Clients = () => {
       key: "title",
       width: "25%",
       align: "center",
+      ...getColumnSearchProps("title"),
     },
     {
       title: "Creator",
@@ -214,7 +248,7 @@ const Clients = () => {
       title: "Domain",
       dataIndex: "domain",
       key: "domain.name",
-      width: "25%",
+      width: "35%",
       align: "center",
       filters: [
         {
@@ -246,7 +280,7 @@ const Clients = () => {
           Medical: "yellow",
           Informatique: "blue",
         };
-        return <Tag color={colors[text.name]}>{text.name}</Tag>;
+        return text.name;
       },
     },
     {

@@ -6,6 +6,7 @@ import {
   getAllPacksUrl,
   createUserUrl,
   updateUser,
+  verifyUser,
 } from "../../Constants";
 import axios from "axios";
 import { message } from "antd";
@@ -235,6 +236,33 @@ export const UpdateUser = (data) => async (dispatch, getState) => {
     .catch((response) => {
       console.log("error eror oror", response);
       message.error("Error while updating user");
+    });
+
+  return response;
+};
+// ---------------------------------------------------------------------
+// --------------------------------------------------------------------
+// --------------------------------------------
+// --------------------------------------------
+export const VerifyUser = (data) => async (dispatch, getState) => {
+  const config = {
+    method: "post",
+    url: verifyUser,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.token,
+    },
+    data,
+  };
+  console.log("data", data);
+  const response = await axios(config)
+    .then((response) => {
+      message.success("User verified successfully");
+      dispatch(fetchAllUsers());
+    })
+    .catch((response) => {
+      console.log("error eror oror", response);
+      message.error("Error while verifying user");
     });
 
   return response;

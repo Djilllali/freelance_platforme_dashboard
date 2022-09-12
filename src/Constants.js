@@ -3,7 +3,8 @@ const base_url2 = "/";
 export const downloadFileZipUrl = base_url + "files/";
 
 export const updateUser = base_url + "users/EditUser";
-export const profile_url = base_url + "users/get_profile";
+export const verifyUser = base_url + "users/verifyUser";
+export const profile_url = base_url + "users/get_user_profile";
 export const signInUrl = base_url + "admins/login";
 export const getAllUsers = base_url + "users/get_users";
 export const getAlljobs = base_url + "jobs/getAllJobs";

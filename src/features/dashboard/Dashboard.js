@@ -34,6 +34,7 @@ import { Content } from "antd/lib/layout/layout";
 import users from "../users/users";
 import Jobs from "../jobs/jobs";
 import Job from "../single-job/job";
+import Domains from "../domains/domains"
 
 const { Header, Footer, Sider } = Layout;
 const { Text } = Typography;
@@ -41,7 +42,7 @@ const { SubMenu } = Menu;
 let keys = {
   "/dashboard/users": "users",
   "/dashboard/allJobs": "allJobs",
-  "/dashboard/users/encours": "encours",
+  "/dashboard/domains": "domains",
   "/dashboard/users/termine": "termine",
   "/dashboard/users/archive": "archive",
 };
@@ -85,8 +86,8 @@ let Dashboard = ({}) => {
       case "allJobs":
         history.push("/dashboard/allJobs");
         break;
-      case "encours":
-        history.push("/dashboard/users/encours");
+      case "domains":
+        history.push("/dashboard/domains");
         break;
       case "termine":
         history.push("/dashboard/users/termine");
@@ -220,13 +221,13 @@ let Dashboard = ({}) => {
           )} */}
 
           <Menu.Item key="encours" icon={<LoadingOutlined />}>
-            Marketing
+            Domains
           </Menu.Item>
 
           <Menu.Item key="termine" icon={<SafetyCertificateOutlined />}>
             Plans
           </Menu.Item>
-          <Menu.Item key="" icon={<SafetyCertificateOutlined />}>
+          <Menu.Item key="req" icon={<SafetyCertificateOutlined />}>
             Withdrawals requests
           </Menu.Item>
         </Menu>
@@ -299,6 +300,7 @@ let Dashboard = ({}) => {
               path="/dashboard/jobs/:_id"
               component={Job}
             /> */}
+            <Route exact path="/dashboard/domains" component={Domains} />
             <Route exact path="/dashboard/allJobs/:_id" component={Job} />
             <Route exact path="/dashboard/allJobs" component={Jobs} />
             <Route exact path="/dashboard/" />
