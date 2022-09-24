@@ -280,7 +280,7 @@ const Clients = () => {
           Medical: "yellow",
           Informatique: "blue",
         };
-        return text.name;
+        return text?.name;
       },
     },
     {

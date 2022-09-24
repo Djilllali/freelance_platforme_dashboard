@@ -20,7 +20,7 @@ import {
 import Modal from "antd/lib/modal/Modal";
 import { UploadOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSinglejob, updateJob } from "./jobSlice";
+import { fetchSinglejob, updateJob, deleteJob } from "./jobSlice";
 import Highlighter from "react-highlight-words";
 import Title from "antd/lib/skeleton/Title";
 import { Switch } from "react-router-dom";
@@ -48,6 +48,7 @@ const Contt = ({ children, extra }) => {
   );
 };
 const { RangePicker } = DatePicker;
+const { TextArea } = Input;
 const Clients = () => {
   const { _id } = useParams();
   let history = useHistory();
@@ -150,22 +151,16 @@ const Clients = () => {
               {!addNew.edit ? (
                 fetchSingleJobResult?.oneJob?.description
               ) : (
-                <Input
+                <TextArea
                   onChange={(e) =>
                     setAddNew({
                       ...addNew,
                       description: e.target.value,
                     })
                   }
+                  rows={10}
                   value={addNew.description}
-                  style={{
-                    width: "369px",
-                    height: 30,
-                    marginBottom: 8,
-                    marginTop: 8,
-                    fontSize: "15px",
-                    display: "block",
-                  }}
+                 
                 />
               )}
             </Descriptions.Item>
@@ -366,7 +361,20 @@ const Clients = () => {
             </Button>
           )}
         </Col>
-
+        <Col offset={1}>
+          {!addNew.edit && (
+            <Button
+              type="danger"
+              size="large"
+              onClick={() => {
+                dispatch(deleteJob({ _id: fetchSingleJobResult?.oneJob?._id }));
+                history.push("/dashboard/allJobs");
+              }}
+            >
+              delete
+            </Button>
+          )}
+        </Col>
         <Col offset={1}>
           {addNew.edit && (
             <Button size="large" type="primary" onClick={handleaddNew}>

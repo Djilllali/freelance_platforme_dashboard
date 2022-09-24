@@ -13,6 +13,7 @@ import {
   DatePicker,
   Tag,
   message,
+  Pagination,
   Skeleton,
   Divider,
 } from "antd";
@@ -77,6 +78,9 @@ const Clients = () => {
   const fetchAllUsersResult = useSelector(
     (state) => state.users.fetchAllUsersResult
   );
+
+  const nbreOfDocs = useSelector((state) => state.users.nbreOfDocs);
+  const selectedPage = useSelector((state) => state.users.page);
   const fetchAllDomainsResult = useSelector(
     (state) => state.users.fetchAllDomainsResult
   );
@@ -590,35 +594,33 @@ const Clients = () => {
                     />
                   </Col>
                 </Row>
-                {!addNew.update && (
-                  <Row>
-                    <Col span={8}>
-                      <Text type="secondary" style={{ fontSize: "20px" }}>
-                        Password:
-                      </Text>
-                    </Col>
-                    <Col span={16}>
-                      {" "}
-                      <Input
-                        onChange={(e) =>
-                          setAddNew({
-                            ...addNew,
-                            password: e.target.value,
-                          })
-                        }
-                        type="password"
-                        style={{
-                          width: "369px",
-                          height: 30,
-                          marginBottom: 8,
-                          marginTop: 8,
-                          fontSize: "15px",
-                          display: "block",
-                        }}
-                      />
-                    </Col>
-                  </Row>
-                )}
+                <Row>
+                  <Col span={8}>
+                    <Text type="secondary" style={{ fontSize: "20px" }}>
+                      Password:
+                    </Text>
+                  </Col>
+                  <Col span={16}>
+                    {" "}
+                    <Input
+                      onChange={(e) =>
+                        setAddNew({
+                          ...addNew,
+                          password: e.target.value,
+                        })
+                      }
+                      type="password"
+                      style={{
+                        width: "369px",
+                        height: 30,
+                        marginBottom: 8,
+                        marginTop: 8,
+                        fontSize: "15px",
+                        display: "block",
+                      }}
+                    />
+                  </Col>
+                </Row>
                 <Row>
                   <Col span={8}>
                     <Text type="secondary" style={{ fontSize: "20px" }}>
@@ -735,7 +737,36 @@ const Clients = () => {
           </Contt>
           <Footer style={{ marginTop: 10, background: "#fff" }}>
             <Row justify="end">
-              <Col>All users: {fetchAllUsersResult?.data?.length}</Col>
+              <Col>
+                {" "}
+                <span className="tab"> Total number of users:</span>{" "}
+              </Col>
+              <Col>
+                {
+                  <Spin spinning={isFetchingTickets}>
+                    <Pagination
+                      size="small"
+                      total={nbreOfDocs}
+                      pageSize={15}
+                      showSizeChanger={false}
+                      showTotal={(total) => (
+                        <Tag style={{ fontSize: "30px" }} color="geekblue">
+                          {total}
+                        </Tag>
+                      )}
+                      current={selectedPage}
+                      onChange={(page, pageSize) => {
+                        dispatch(setPage(page));
+                        dispatch(
+                          fetchAllUsers({
+                            page,
+                          })
+                        );
+                      }}
+                    />
+                  </Spin>
+                }
+              </Col>
             </Row>
           </Footer>
         </Col>

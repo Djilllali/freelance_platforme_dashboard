@@ -1,12 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import {
+  addDomainsUrl,
   getAllUsers,
   getAllDomainsUrl,
   getAllPacksUrl,
   createUserUrl,
   updateUser,
   verifyUser,
+  deleteDomainsUrl,
 } from "../../Constants";
 import axios from "axios";
 import { message } from "antd";
@@ -128,7 +130,7 @@ export const fetchAllUsers = (data) => (dispatch, getState) => {
     data,
   };
   dispatch(setFetchingAllUsers(true));
-
+console.log("data", data);
   const response = axios(config)
     .then((response) => {
       dispatch(setAllUsersResult(response.data));
@@ -163,6 +165,54 @@ export const fetchAllDomains = (data) => (dispatch, getState) => {
     });
 
   return response.data;
+};
+// --------------------------------------------
+// --------------------------------------------
+export const AddnewDomain = (data) => async (dispatch, getState) => {
+  const config = {
+    method: "post",
+    url: addDomainsUrl,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.token,
+    },
+    data,
+  };
+
+  const response = await axios(config)
+    .then((response) => {
+      message.success("Domain added successfully");
+      dispatch(fetchAllDomains());
+    })
+    .catch((response) => {
+      message.error("Error while adding the domain ");
+    });
+
+  return response;
+};
+// --------------------------------------------
+// --------------------------------------------
+export const deleteDomain = (data) => async (dispatch, getState) => {
+  const config = {
+    method: "post",
+    url: deleteDomainsUrl,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.token,
+    },
+    data,
+  };
+
+  const response = await axios(config)
+    .then((response) => {
+      message.success("Domain deleted successfully");
+      dispatch(fetchAllDomains());
+    })
+    .catch((response) => {
+      message.error("Error while deleting the domain ");
+    });
+
+  return response;
 };
 // --------------------------------------------
 // --------------------------------------------

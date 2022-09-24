@@ -12,7 +12,10 @@ export const CreateJobUrl = base_url + "jobs/createNewJob";
 export const getSinglejobUrl = base_url + "jobs/getOneJob/";
 export const updateJobUrl = base_url + "jobs/updateJob";
 export const uploadZipFileUrl = base_url + "s3/upload";
+export const deleteJobUrl = base_url + "jobs/deleteJob";
 
 export const getAllDomainsUrl = base_url + "domains/get";
+export const addDomainsUrl = base_url + "domains/createNewDomain";
+export const deleteDomainsUrl = base_url + "domains/deleteDomain";
 export const getAllPacksUrl = base_url + "packs/get";
 export const createUserUrl = base_url + "users/createUser";

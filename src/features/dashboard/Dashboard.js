@@ -220,7 +220,7 @@ let Dashboard = ({}) => {
             </Menu.Item>
           )} */}
 
-          <Menu.Item key="encours" icon={<LoadingOutlined />}>
+          <Menu.Item key="domains" icon={<LoadingOutlined />}>
             Domains
           </Menu.Item>
 

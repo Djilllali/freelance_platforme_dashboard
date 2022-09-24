@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { getSinglejobUrl, updateJobUrl } from "../../Constants";
+import { getSinglejobUrl, updateJobUrl, deleteJobUrl } from "../../Constants";
 import axios from "axios";
 import { message } from "antd";
 import { act } from "@testing-library/react";
@@ -98,7 +98,7 @@ export const updateJob = (data) => (dispatch, getState) => {
   const response = axios(config)
     .then((response) => {
       message.success("Job updated successfully");
-        dispatch(fetchSinglejob({ _id: response.data.data }));
+      dispatch(fetchSinglejob({ _id: response.data.data }));
     })
     .catch((response) => {
       message.error("Error while updating job");
@@ -106,6 +106,30 @@ export const updateJob = (data) => (dispatch, getState) => {
 
   return response.data;
 };
+// --------------------------------------------
+export const deleteJob = (data) => async (dispatch, getState) => {
+  const config = {
+    method: "post",
+    url: deleteJobUrl,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.token,
+    },
+    data,
+  };
+
+  const response = await axios(config)
+    .then((response) => {
+      message.success("Job deleted successfully");
+    })
+    .catch((response) => {
+      message.error("Error while deleting the job ");
+    });
+
+  return response;
+};
+// --------------------------------------------
+// --------------------------------------------
 
 export const selectCount = (state) => state.dashboard.value;
 
