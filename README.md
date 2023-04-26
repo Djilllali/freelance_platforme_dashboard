@@ -1,5 +1,5 @@
 
-# TICKETING SYSTEM
+# freelance platform dashboard
 # IN OREDR TO RUN THIS APP LOCALLY YOU HAAVE TO SETTUP REDIS 
 
 # you can find here all the requierd steps to settup redis globally on your system
